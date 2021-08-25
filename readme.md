@@ -15,7 +15,7 @@
 - venvの作成
 - requirements.txtのインストール
 - VSCODEにmysql拡張機能をインストールする<BR>
-![mysql]("https://i.gyazo.com/a2c3368fe9def84a2bfdad92b8e123f8.png")
+![mysql](https://i.gyazo.com/a2c3368fe9def84a2bfdad92b8e123f8.png)
 - docker-composeを実行しMySQLコンテナを起動する(dockerは事前にインストールしておくこと)
 ```
 新しいターミナルを開く
@@ -34,6 +34,7 @@ Port: 4444
 Username: docker
 Password: docker
 ```
+![img](https://i.gyazo.com/50cce7c54d90fd56f8dca1ea92f7c40d.png)
 
 # 実行方法
 ```
