@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  db:
+    container_name: crowdsoucing_db
+    image: mysql:5.7
+    restart: always
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "4444:3306" #ローカルのmysqlと重複しないようにローカル側は4444を用いる
+    environment:
+      MYSQL_ROOT_PASSWORD: docker
+      MYSQL_DATABASE: docker
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+  
