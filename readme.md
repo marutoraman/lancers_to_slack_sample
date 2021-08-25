@@ -14,7 +14,7 @@
 - .env.develop → .envにリネーム
 - venvの作成
 - requirements.txtのインストール
-- docker-composeを実行しMySQLコンテナを起動する
+- docker-composeを実行しMySQLコンテナを起動する(dockerは事前にインストールしておくこと)
 ```
 新しいターミナルを開く
 cd docker
