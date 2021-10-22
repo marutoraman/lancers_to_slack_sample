@@ -1,3 +1,13 @@
+import sentry_sdk
+sentry_sdk.init(
+    "https://a45c236d53b540778ff534f6b5d7a584@o949130.ingest.sentry.io/6030339",
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0
+)
+
 import os
 import sys
 from sqlalchemy.orm.session import Session
@@ -139,7 +149,33 @@ def loop(page_limit:int=3):
         send_slack()
         logger.info("send completed")
         time.sleep(180)
+
+
+def run(page_limit: int=3):
+    logger.info("start")
+
+    try:
+        crawle(site="lancers", page_limit=page_limit)
+    except Exception as e:
+        logger.error(e)
     
+    try:
+        crawle(site="cw", page_limit=page_limit)
+    except Exception as e:
+        logger.error(e)
+        
+    try:
+        crawle(site="coconala", page_limit=page_limit)
+    except Exception as e:
+        logger.error(e)
+        
+    try:
+        send_slack()
+    except Exception as e:
+        logger.error(e)
+        
+    logger.info("completed")
+
     
 if __name__ == "__main__":
     fire.Fire()

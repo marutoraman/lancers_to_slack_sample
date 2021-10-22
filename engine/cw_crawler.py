@@ -32,9 +32,12 @@ class CWCrawler(BaseCrawler):
     def search_job_items(self, keyword: str="", exclude_keyword: str="", page_limit: int=3, exclude_work_ids: list=[]):        
         results = []
         for page in range(page_limit):
-            results.extend(self.search_job_items_for_page(keyword=keyword, exclude_keyword=exclude_keyword, exclude_work_ids=exclude_work_ids, page=page+1))
-            logger.info(f"page crawled: {page+1}")
-
+            try:
+                results.extend(self.search_job_items_for_page(keyword=keyword, exclude_keyword=exclude_keyword, exclude_work_ids=exclude_work_ids, page=page+1))
+                logger.info(f"page crawled: {page+1}")
+            except Exception as e:
+                logger.error(f"page crawle failed: {page+1} | {e}")
+                
         return results
 
 
