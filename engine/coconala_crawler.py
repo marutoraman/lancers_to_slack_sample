@@ -23,9 +23,10 @@ from common.logger import set_logger
 logger = set_logger(__name__)
 
 
-class LancersCrawler(BaseCrawler):
-    WORK_DETAIL_URL = "https://www.lancers.jp/work/detail/"
-    WORK_SEARCH_URL = "https://www.lancers.jp/work/search/system"
+class CoconalaCrawler(BaseCrawler):
+    WORK_DETAIL_URL = "https://coconala.com/requests/{work_id}"
+    WORK_SEARCH_URL = "https://coconala.com/requests/categories/11"
+    # https://crowdworks.jp/public/jobs/search?category_id=226&search%5Bkeywords%5D=%E3%83%87%E3%83%BC%E3%82%BF&keep_search_criteria=true&order=score&hide_expired=true
 
 
     def search_job_items(self, keyword: str="", exclude_keyword: str="", page_limit: int=3, exclude_work_ids: list=[]):        
@@ -39,15 +40,9 @@ class LancersCrawler(BaseCrawler):
 
     def search_job_items_for_page(self, keyword: str="", exclude_keyword: str="", exclude_work_ids: list=[], page: int=1):
         params = {
-            "open": 1,
-            "ref": "header_menu",
-            "show_description": 0,
-            "work_rank[]": [0, 1, 2, 3],
-            "type[]": "project",
-            "budget_from": "",
-            "budget_to": "",
+            "categoryId": "11",
+            "recruiting": "true",
             "keyword": keyword,
-            "not": exclude_keyword,
             "page": page
         }
         #https://www.lancers.jp/work/search/system?open=1&ref=header_menu&show_description=0&work_rank%5B%5D=0&work_rank%5B%5D=1&work_rank%5B%5D=2&work_rank%5B%5D=3
@@ -58,7 +53,7 @@ class LancersCrawler(BaseCrawler):
             logger.error(e)
             raise Exception(e)
         # 詳細ページへのリンクを取得
-        detail_link_elms = soup.select("a.c-media__title")
+        detail_link_elms = soup.select(".c-itemInfo_title > a")
         
         # SearchedItemに格納
         items = []
@@ -68,18 +63,19 @@ class LancersCrawler(BaseCrawler):
                 if not link:
                     logger.error(f"job detail link is not found")
                     continue
-                work_id = re_search("work/detail/(.*)", link)
+                print(link)
+                work_id = re_search(r"/requests/(.*)", link)
                 if work_id in exclude_work_ids:
                     logger.info(f"[skip] already crawled: {link}")
                     continue
                 if work_id == None:
-                    logger.info(f"純粋なlances以外の案件はスキップ: {link}")
+                    logger.info(f"純粋なCoconala以外の案件はスキップ: {link}")
                     continue
                 #work_id = link.split("/")[-1]
                 items.append(
                     SearchedItem(
                         work_id = work_id,
-                        site = "lancers"
+                        site = "coconala"
                     )
                 )
             except Exception as e:
@@ -89,23 +85,23 @@ class LancersCrawler(BaseCrawler):
         
     
     def fetch_work_detail(self, work_id: str):
-        soup = self.fetch_html_to_bs(self.WORK_DETAIL_URL + work_id)
+        soup = self.fetch_html_to_bs(self.WORK_DETAIL_URL.format(work_id = work_id))
     
         try:
-            title = soup.select_one(".c-heading.heading--lv1").text.split("\n")[1].strip()
+            title = soup.select_one(".c-requestTitle > h1").text.strip()
         except:
             title = None
             
         try:
-            description = "".join([elm.select_one("dd").text.strip() for elm in soup.select(".c-definitionList.definitionList--holizonalA01") if elm.text.find("依頼の目的・背景") >= 0])
+            description = soup.select_one(".c-detail .c-detailRowContentText").text.strip()
             #description = lxml_soup.xpath("span[contains(text(), '依頼の目的・背景')]")
         except Exception as e:
             print(e)
             description = None
         
         try:
-            proposales_count = int(soup.select(".worksummary__text")[1].text.replace("件", ""))
-        except:
+            proposales_count = int(soup.select_one(".c-requestOutlineRowContent_emphasis.c-requestOutlineRowContent_emphasis-proposals").text)
+        except Exception as e:
             proposales_count = None
         
         item = SearchedItem(

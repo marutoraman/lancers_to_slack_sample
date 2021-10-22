@@ -23,9 +23,17 @@ class BaseCrawler():
     HEADERS = {"Accept": "*/*",
                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36}"}
     
-    def fetch_html_to_bs(self, url: str) -> bs:
-        res = requests.get(url, headers=self.HEADERS)
+    def fetch_html_to_bs(self, url: str, params: dict={}) -> bs:
+        res = requests.get(url, headers=self.HEADERS, params=params)
         if not(300 > res.status_code >= 200):
+            print(res.text)
             logger.error(f"fetch_html error | status_code: {res.status_code}")
             raise Exception(f"fetch_html error | status_code: {res.status_code}")
         return bs(res.text, "html.parser")
+    
+    def fetch_html(self, url: str, params: dict={}):
+        res = requests.get(url, headers=self.HEADERS, params=params)
+        if not(300 > res.status_code >= 200):
+            logger.error(f"fetch_html error | status_code: {res.status_code}")
+            raise Exception(f"fetch_html error | status_code: {res.status_code}")
+        return res

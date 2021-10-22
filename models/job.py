@@ -19,13 +19,18 @@ class Job(Base):
     work_id = Column(String(128), nullable=False)
     price_min = Column(Integer, nullable=True)
     price_max = Column(Integer, nullable=True)
-    proposales_number = Column(Integer, nullable=True)
+    proposales_count = Column(Integer, nullable=True)
     client_id = Column(String(16), nullable=True)
     
     description = Column(Text, nullable=True)
     start_at = Column(DateTime, nullable=True) # 開始日時
     end_at = Column(DateTime, nullable=True) # 締め切り日時
     desired_delivery_at = Column(DateTime, nullable=True) # 希望納期
+    site = Column(String(16), nullable=False)
+    
+    search_index_words = Column(Text, nullable=True)
+    
+    is_send = Column(Boolean, server_default='0')
 
     created_at = Column(DateTime, nullable=False, server_default=current_timestamp())
     updated_at = Column(DateTime, nullable=False, default=current_timestamp(), onupdate=func.utc_timestamp())
@@ -34,9 +39,10 @@ class Job(Base):
     def to_dict(self):
         return self.__dict__.copy()
 
-    def merge(self, insrtance):
+    def merge(self, insrtance, exclude_keys: list=[]):
+        exclude_keys.append("id")
         for key, value in insrtance.to_dict().items():
-            if key == "id":
+            if key in exclude_keys:
                 continue
             if value == None:
                 continue
