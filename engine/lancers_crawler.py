@@ -14,7 +14,6 @@ from sqlalchemy import or_
 
 from engine.base_crawler import *
 from engine.searched_item import *
-from common.selenium_manager import *
 from common.logger import *
 from common.utility import datetime_to_string, download_img, exists_or_create_dir, now_time_delta, re_search, to_datetime
 
