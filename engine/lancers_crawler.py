@@ -1,4 +1,3 @@
-from common.database import get_db_instance
 import re
 import time
 import traceback
@@ -24,7 +23,7 @@ logger = set_logger(__name__)
 
 
 class LancersCrawler(BaseCrawler):
-    WORK_DETAIL_URL = "https://www.lancers.jp/work/detail/"
+    WORK_DETAIL_URL = "https://www.lancers.jp/work/detail/{work_id}"
     WORK_SEARCH_URL = "https://www.lancers.jp/work/search/system"
 
 
@@ -92,7 +91,7 @@ class LancersCrawler(BaseCrawler):
         
     
     def fetch_work_detail(self, work_id: str):
-        soup = self.fetch_html_to_bs(self.WORK_DETAIL_URL + work_id)
+        soup = self.fetch_html_to_bs(self.WORK_DETAIL_URL.format(work_id = work_id))
     
         try:
             title = soup.select_one(".c-heading.heading--lv1").text.split("\n")[1].strip()
